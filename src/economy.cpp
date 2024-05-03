@@ -113,48 +113,7 @@ extern int GetAmountOwnedBy(const Company *c, Owner owner);
  * @param c The company to calculate the value of.
  * @return The value of the assets of the company.
  */
-Money CalculateCompanyValue(const Company *c, bool including_loan)
-{
-	Money owned_shares_value = 0;
 
-	for (const Company *co : Company::Iterate()) {
-		int shares_owned = GetAmountOwnedBy(co, c->index);
-
-		if (shares_owned > 0) owned_shares_value += (CalculateCompanyValueExcludingShares(co) / 4) * shares_owned;
-	}
-
-	return owned_shares_value + CalculateCompanyValueExcludingShares(c);
-}
-
-Money CalculateCompanyValueExcludingShares(const Company *c, bool including_loan)
-{
-	Owner owner = c->index;
-
-	uint num = 0;
-
-	for (const Station *st : Station::Iterate()) {
-		if (st->owner == owner) num += CountBits((byte)st->facilities);
-	}
-
-	Money value = num * _price[PR_STATION_VALUE] * 25;
-
-	for (const Vehicle *v : Vehicle::Iterate()) {
-		if (v->owner != owner) continue;
-
-		if (v->type == VEH_TRAIN ||
-				v->type == VEH_ROAD ||
-				(v->type == VEH_AIRCRAFT && Aircraft::From(v)->IsNormalAircraft()) ||
-				v->type == VEH_SHIP) {
-			value += v->value * 3 >> 1;
-		}
-	}
-
-/**
- * Calculate the value of the assets of a company.
- *
- * @param c The company to calculate the value of.
- * @return The value of the assets of the company.
- */
 static Money CalculateCompanyAssetValue(const Company *c)
 {
 	Owner owner = c->index;
@@ -204,7 +163,7 @@ Money CalculateCompanyValue(const Company *c, bool including_loan)
 	for (const Company *co : Company::Iterate()) {
 		int shares_owned = GetAmountOwnedBy(co, c->index);
 
-		if (shares_owned > 0) owned_shares_value += (CalculateCompanyValueExcludingShares(co) / 4) * shares_owned;
+		if (shares_owned > 0) owned_shares_value += (CalculateCompanyAssetValue(co) / 4) * shares_owned;
 	}
 	value += owned_shares_value;	
 
@@ -424,7 +383,7 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 	}
 
 	/* Sell all the shares that people have on this company */
-	Backup<CompanyID> cur_company2(_current_company, FILE_LINE);
+	Backup<CompanyID> cur_company2(_current_company);
 	Company *c = Company::Get(old_owner);
 	for (auto &share_owner : c->share_owners) {
 		if (share_owner == INVALID_OWNER) continue;
@@ -2137,7 +2096,7 @@ CommandCost CmdBuyShareInCompany(DoCommandFlag flags, CompanyID target_company)
 	if (c == nullptr || !_settings_game.economy.allow_shares || _current_company == target_company) return CMD_ERROR;
 
 	/* Protect new companies from hostile takeovers */
-	if (TimerGameCalendar::year - c->inaugurated_year < _settings_game.economy.min_years_for_shares) return_cmd_error(STR_ERROR_PROTECTED);
+	if (TimerGameEconomy::year - c->inaugurated_year < _settings_game.economy.min_years_for_shares) return_cmd_error(STR_ERROR_PROTECTED);
 
 	/* Those lines are here for network-protection (clients can be slow) */
 	if (GetAmountOwnedBy(c, INVALID_OWNER) == 0) return cost;
@@ -2158,7 +2117,7 @@ CommandCost CmdBuyShareInCompany(DoCommandFlag flags, CompanyID target_company)
 		auto current_company_owns_share = [](auto share_owner) { return share_owner == _current_company; };
 		if (std::all_of(c->share_owners.begin(), c->share_owners.end(), current_company_owns_share)) {
 			c->bankrupt_value = 0;
-			DoAcquireCompany(c);
+			DoAcquireCompany(c, false);
 		}
 		InvalidateWindowData(WC_COMPANY, target_company);
 		CompanyAdminUpdate(c);

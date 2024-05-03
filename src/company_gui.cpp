@@ -2243,14 +2243,18 @@ struct CompanyWindow : Window
 
 			/* Enable/disable 'Relocate HQ' button. */
 			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_RELOCATE)->SetDisplayedPlane((!local || c->location_of_HQ == INVALID_TILE) ? CWP_RELOCATE_HIDE : CWP_RELOCATE_SHOW);
+
 			/* Owners of company */
 			auto invalid_owner = [](auto owner) { return owner == INVALID_COMPANY; };
-			plane = std::all_of(c->share_owners.begin(), c->share_owners.end(), invalid_owner) ? SZSP_HORIZONTAL : 0;
-			wi = this->GetWidget<NWidgetStacked>(WID_C_SELECT_DESC_OWNERS);
+			auto plane = std::all_of(c->share_owners.begin(), c->share_owners.end(), invalid_owner) ? SZSP_HORIZONTAL : 0;
+			auto wi = this->GetWidget<NWidgetStacked>(WID_C_SELECT_DESC_OWNERS);
 			if (plane != wi->shown_plane) {
 				wi->SetDisplayedPlane(plane);
 				reinit = true;
 			}
+
+			//reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_DESC_OWNERS)->SetDisplayedPlane(c->share_owners.begin(), c->share_owners.end(), invalid_owner) ? SZSP_HORIZONTAL : 0);
+
 			/* Enable/disable 'Give money' button. */
 			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_GIVE_MONEY)->SetDisplayedPlane((local || _local_company == COMPANY_SPECTATOR || !_settings_game.economy.give_money) ? SZSP_NONE : 0);
 			/* Enable/disable 'Hostile Takeover' button. */
@@ -2314,7 +2318,7 @@ struct CompanyWindow : Window
 					SetDParamMaxValue(0, 75);
 					SetDParam(1, c2->index);
 
-					size->width = std::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_SHARES_OWNED_BY).width);
+					size.width = std::max(size.width, GetStringBoundingBox(STR_COMPANY_VIEW_SHARES_OWNED_BY).width);
 				}
 				break;
 			}
@@ -2446,7 +2450,7 @@ struct CompanyWindow : Window
 						SetDParam(1, c2->index);
 
 						DrawString(r.left, r.right, y, STR_COMPANY_VIEW_SHARES_OWNED_BY);
-						y += FONT_HEIGHT_NORMAL;
+						y += GetCharacterHeight(FS_NORMAL);
 					}
 				}
 				break;
