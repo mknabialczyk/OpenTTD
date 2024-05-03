@@ -2231,6 +2231,13 @@ STR_CONFIG_SETTING_ECONOMY_TYPE_ORIGINAL                        :класічн�
 STR_CONFIG_SETTING_ECONOMY_TYPE_SMOOTH                          :плыўная
 STR_CONFIG_SETTING_ECONOMY_TYPE_FROZEN                          :стабільная
 
+STR_CONFIG_SETTING_ALLOW_SHARES                                 :Дазволіць купляць акцыі іншых кампаніяў: {STRING}
+STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Калі ўключана, дазваляецца купляць і прадаваць долі ў кампаніях. Акцыі даступны для кампаніяў, якія дасягнулі пэўнага ўзросту.
+
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Мін. узрост кампаніі для выпуску акцыяў: {STRING}
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Мінімальны ўзрост, якога павінна дасягнуць кампанія для пачатку выпуску акцыяў, якімі змогуць гандляваць іншыя гульцы.
+###setting-zero-is-special
+
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Адсотак даходу, якi налiчваецца пры частковай перавозцы: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Адсотак даходу, які налічваецца на прамежкавых адцінках у вялікіх сетках, даючы большы кантроль над даходамі.
 
@@ -4216,6 +4223,7 @@ STR_COMPANY_VIEW_AIRCRAFT                                       :{WHITE}{COMMA} 
 STR_COMPANY_VIEW_SHIPS                                          :{WHITE}{COMMA} караб{P ель лi лёў}
 STR_COMPANY_VIEW_VEHICLES_NONE                                  :{WHITE}няма
 STR_COMPANY_VIEW_COMPANY_VALUE                                  :{GOLD}Кошт кампаніі: {WHITE}{CURRENCY_LONG}
+STR_COMPANY_VIEW_SHARES_OWNED_BY                                :{WHITE}({COMMA}% валодае {COMPANY})
 STR_COMPANY_VIEW_INFRASTRUCTURE                                 :{GOLD}Iнфраструктура:
 STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} чыгуначн{P ы ыя ых} {P ў ў у}част{P ак кi каў}
 STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} дарожн{P ы ыя ых} {P ў ў у}част{P ак кi каў}
@@ -4245,6 +4253,11 @@ STR_COMPANY_VIEW_COMPANY_NAME_BUTTON                            :{BLACK}Назв
 STR_COMPANY_VIEW_COMPANY_NAME_TOOLTIP                           :{BLACK}Зьмяніць назву кампаніі
 STR_COMPANY_VIEW_PRESIDENT_NAME_BUTTON                          :{BLACK}Дырэктар
 STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP                         :{BLACK}Зьмяніць імя дырэктара
+
+STR_COMPANY_VIEW_BUY_SHARE_BUTTON                               :{BLACK}Купіць 25% акцыяў кампаніі
+STR_COMPANY_VIEW_SELL_SHARE_BUTTON                              :{BLACK}Прадаць 25% акцыяў кампаніі
+STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Набыць 25% акцыяў гэтай кампаніі. Shift+пстрычка — ацэнка кошту акцыяў.
+STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Прадаць 25% акцыяў гэтай кампаніі. Shift+пстрычка — ацэнка кошту акцыяў.
 
 STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Кампанія
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Імя дырэктара
@@ -5342,6 +5355,9 @@ STR_ERROR_INSUFFICIENT_FUNDS                                    :{WHITE}Нема
 STR_ERROR_CAN_T_GIVE_MONEY                                      :{WHITE}Немагчыма перадаць грошы гэтай кампаніі...
 STR_ERROR_CAN_T_BUY_COMPANY                                     :{WHITE}Немагчыма набыць кампанію...
 STR_ERROR_CAN_T_BUILD_COMPANY_HEADQUARTERS                      :{WHITE}Тут немагчыма пабудаваць штаб-кватэру кампанii...
+STR_ERROR_CAN_T_BUY_25_SHARE_IN_THIS                            :{WHITE}Немагчыма купіць 25% акцыяў гэтай кампаніі...
+STR_ERROR_CAN_T_SELL_25_SHARE_IN                                :{WHITE}Немагчыма прадаць 25% акцый гэтай кампаніі...
+STR_ERROR_PROTECTED                                             :{WHITE}Гэтая кампанія яшчэ не выпускае акцыі...
 
 # Town related errors
 STR_ERROR_CAN_T_GENERATE_TOWN                                   :{WHITE}Немагчыма пабудаваць гарады...

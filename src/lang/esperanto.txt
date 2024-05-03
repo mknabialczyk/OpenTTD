@@ -3786,6 +3786,7 @@ STR_COMPANY_VIEW_AIRCRAFT                                       :{WHITE}{COMMA} 
 STR_COMPANY_VIEW_SHIPS                                          :{WHITE}{COMMA} ŝipo{P "" j}
 STR_COMPANY_VIEW_VEHICLES_NONE                                  :{WHITE}Neniu
 STR_COMPANY_VIEW_COMPANY_VALUE                                  :{GOLD}Kompania valoro: {WHITE}{CURRENCY_LONG}
+STR_COMPANY_VIEW_SHARES_OWNED_BY                                :{WHITE}({COMMA}% posedataj de {COMPANY})
 STR_COMPANY_VIEW_INFRASTRUCTURE                                 :{GOLD}Infrastrukturo:
 STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} fervojpeco{P "" j}
 STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} vojpeco{P "" j}
@@ -3815,6 +3816,10 @@ STR_COMPANY_VIEW_COMPANY_NAME_BUTTON                            :{BLACK}Kompanin
 STR_COMPANY_VIEW_COMPANY_NAME_TOOLTIP                           :{BLACK}Ŝanĝu la nomon de la kompanio
 STR_COMPANY_VIEW_PRESIDENT_NAME_BUTTON                          :{BLACK}Manaĝantnomo
 STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP                         :{BLACK}Ŝanĝu la nomon de la manaĝanto
+STR_COMPANY_VIEW_BUY_SHARE_BUTTON                               :{BLACK}Aĉetu 25%-an dividaĵon
+STR_COMPANY_VIEW_SELL_SHARE_BUTTON                              :{BLACK}Vendu 25%-an dividaĵon
+STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Aĉetu 25%-an dividaĵon en ĉi tiu kompanio. Tenu la maljuskliga klavo por (kosto)taksi sen aĉeti dividaĵojn
+STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Vendu 25%-an dividaĵon en ĉi tiu kompanio. Tenu la maljuskliga klavo por (enspezo)taksi sen vendi dividaĵojn
 
 STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Kompania Nomo
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Nomo de la Manaĝanto
