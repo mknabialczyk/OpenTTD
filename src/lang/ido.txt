@@ -764,6 +764,9 @@ STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_VIOLET                  :Violkolora
 ###length 3
 
 
+###setting-zero-is-special
+
+
 
 
 ###length 2
@@ -1182,6 +1185,7 @@ STR_FINANCES_LOAN_TITLE                                         :{WHITE}Prest-aj
 # Company view
 
 STR_COMPANY_VIEW_VEHICLES_TITLE                                 :{GOLD}Vehili:
+
 
 
 
