@@ -2254,6 +2254,8 @@ static SettingsContainer &GetSettingsTree()
 			}
 
 			ai->Add(new SettingEntry("economy.give_money"));
+			ai->Add(new SettingEntry("economy.allow_shares"));
+			ai->Add(new SettingEntry("economy.min_years_for_shares"));
 		}
 
 		SettingsPage *network = main->Add(new SettingsPage(STR_CONFIG_SETTING_NETWORK));

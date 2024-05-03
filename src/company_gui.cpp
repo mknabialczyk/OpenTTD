@@ -2174,8 +2174,18 @@ static constexpr NWidgetPart _nested_company_widgets[] = {
 			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_C_PRESIDENT_NAME), SetFill(1, 0), SetDataTip(STR_COMPANY_VIEW_PRESIDENT_NAME_BUTTON, STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP),
 			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_C_COMPANY_NAME), SetFill(1, 0), SetDataTip(STR_COMPANY_VIEW_COMPANY_NAME_BUTTON, STR_COMPANY_VIEW_COMPANY_NAME_TOOLTIP),
 		EndContainer(),
+		NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
+			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_C_BUY_SHARE), SetFill(1, 0), SetDataTip(STR_COMPANY_VIEW_BUY_SHARE_BUTTON, STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP),
+			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_C_SELL_SHARE), SetFill(1, 0), SetDataTip(STR_COMPANY_VIEW_SELL_SHARE_BUTTON, STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP),
+		EndContainer(),
 	EndContainer(),
 };
+
+int GetAmountOwnedBy(const Company *c, Owner owner)
+{
+	auto share_owned_by = [owner](auto share_owner) { return share_owner == owner; };
+	return std::count_if(c->share_owners.begin(), c->share_owners.end(), share_owned_by);
+}
 
 /** Strings for the company vehicle counts */
 static const StringID _company_view_vehicle_count_strings[] = {
@@ -2202,6 +2212,10 @@ struct CompanyWindow : Window
 		/* Display planes of the #WID_C_SELECT_RELOCATE selection widget. */
 		CWP_RELOCATE_SHOW = 0, ///< Show the relocate HQ button.
 		CWP_RELOCATE_HIDE,     ///< Hide the relocate HQ button.
+
+		/* Display planes of the #WID_C_SELECT_BUTTONS selection widget. */
+		CWP_BUTTONS_LOCAL = 0, ///< Buttons of the local company.
+		CWP_BUTTONS_OTHER,     ///< Buttons of the other companies.
 	};
 
 	CompanyWindow(WindowDesc *desc, WindowNumber window_number) : Window(desc)
@@ -2229,6 +2243,14 @@ struct CompanyWindow : Window
 
 			/* Enable/disable 'Relocate HQ' button. */
 			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_RELOCATE)->SetDisplayedPlane((!local || c->location_of_HQ == INVALID_TILE) ? CWP_RELOCATE_HIDE : CWP_RELOCATE_SHOW);
+			/* Owners of company */
+			auto invalid_owner = [](auto owner) { return owner == INVALID_COMPANY; };
+			plane = std::all_of(c->share_owners.begin(), c->share_owners.end(), invalid_owner) ? SZSP_HORIZONTAL : 0;
+			wi = this->GetWidget<NWidgetStacked>(WID_C_SELECT_DESC_OWNERS);
+			if (plane != wi->shown_plane) {
+				wi->SetDisplayedPlane(plane);
+				reinit = true;
+			}
 			/* Enable/disable 'Give money' button. */
 			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_GIVE_MONEY)->SetDisplayedPlane((local || _local_company == COMPANY_SPECTATOR || !_settings_game.economy.give_money) ? SZSP_NONE : 0);
 			/* Enable/disable 'Hostile Takeover' button. */
@@ -2286,6 +2308,16 @@ struct CompanyWindow : Window
 				size.width = std::max(size.width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_NONE).width);
 				size.width += padding.width;
 				break;
+
+			case WID_C_DESC_OWNERS: {
+				for (const Company *c2 : Company::Iterate()) {
+					SetDParamMaxValue(0, 75);
+					SetDParam(1, c2->index);
+
+					size->width = std::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_SHARES_OWNED_BY).width);
+				}
+				break;
+			}
 
 			case WID_C_VIEW_HQ:
 			case WID_C_BUILD_HQ:
@@ -2404,6 +2436,22 @@ struct CompanyWindow : Window
 				DrawInfrastructureCountsWidget(r, c);
 				break;
 
+			case WID_C_DESC_OWNERS: {
+				uint y = r.top;
+
+				for (const Company *c2 : Company::Iterate()) {
+					uint amt = GetAmountOwnedBy(c, c2->index);
+					if (amt != 0) {
+						SetDParam(0, amt * 25);
+						SetDParam(1, c2->index);
+
+						DrawString(r.left, r.right, y, STR_COMPANY_VIEW_SHARES_OWNED_BY);
+						y += FONT_HEIGHT_NORMAL;
+					}
+				}
+				break;
+			}
+
 			case WID_C_HAS_PASSWORD:
 				if (_networking && NetworkCompanyIsPassworded(c->index)) {
 					DrawSprite(SPR_LOCK, PAL_NONE, r.left, r.top);
@@ -2503,6 +2551,14 @@ struct CompanyWindow : Window
 				ShowQueryString(STR_EMPTY, STR_COMPANY_VIEW_GIVE_MONEY_QUERY_CAPTION, 30, this, CS_NUMERAL, QSF_NONE);
 				break;
 
+			case WID_C_BUY_SHARE:
+				Command<CMD_BUY_SHARE_IN_COMPANY>::Post(STR_ERROR_CAN_T_BUY_25_SHARE_IN_THIS, (CompanyID)this->window_number);
+				break;
+
+			case WID_C_SELL_SHARE:
+				Command<CMD_SELL_SHARE_IN_COMPANY>::Post(STR_ERROR_CAN_T_SELL_25_SHARE_IN, (CompanyID)this->window_number);
+				break;
+
 			case WID_C_HOSTILE_TAKEOVER:
 				ShowBuyCompanyDialog((CompanyID)this->window_number, true);
 				break;
@@ -2574,11 +2630,33 @@ struct CompanyWindow : Window
 		}
 	}
 
-	void OnInvalidateData([[maybe_unused]] int data = 0, [[maybe_unused]] bool gui_scope = true) override
+
+	/**
+	 * Some data on this window has become invalid.
+	 * @param data Information about the changed data.
+	 * @param gui_scope Whether the call is done from GUI scope. You may not do everything when not in GUI scope. See #InvalidateWindowData() for details.
+	 */
+	void OnInvalidateData(int data = 0, bool gui_scope = true) override
 	{
-		if (gui_scope && data == 1) {
-			/* Manually call OnResize to adjust minimum height of president name widget. */
-			OnResize();
+		if (this->window_number == _local_company) return;
+
+		if (_settings_game.economy.allow_shares) { // Shares are allowed
+			const Company *c = Company::Get(this->window_number);
+
+			/* If all shares are owned by someone (none by nobody), disable buy button */
+			this->SetWidgetDisabledState(WID_C_BUY_SHARE, GetAmountOwnedBy(c, INVALID_OWNER) == 0 ||
+					/* Only 25% left to buy. If the company is human, disable buying it up.. TODO issues! */
+					(GetAmountOwnedBy(c, INVALID_OWNER) == 1 && !c->is_ai) ||
+					/* Spectators cannot do anything of course */
+					_local_company == COMPANY_SPECTATOR);
+
+			/* If the company doesn't own any shares, disable sell button */
+			this->SetWidgetDisabledState(WID_C_SELL_SHARE, (GetAmountOwnedBy(c, _local_company) == 0) ||
+					/* Spectators cannot do anything of course */
+					_local_company == COMPANY_SPECTATOR);
+		} else { // Shares are not allowed, disable buy/sell buttons
+			this->DisableWidget(WID_C_BUY_SHARE);
+			this->DisableWidget(WID_C_SELL_SHARE);
 		}
 	}
 };

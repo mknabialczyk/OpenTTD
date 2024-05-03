@@ -65,6 +65,7 @@ private:
 typedef Pool<Company, CompanyID, 1, MAX_COMPANIES> CompanyPool;
 extern CompanyPool _company_pool;
 
+
 /** Statically loadable part of Company pool item */
 struct CompanyProperties {
 	uint32_t name_2;                   ///< Parameter of #name_1.
@@ -89,6 +90,7 @@ struct CompanyProperties {
 	TileIndex location_of_HQ;        ///< Northern tile of HQ; #INVALID_TILE when there is none.
 	TileIndex last_build_coordinate; ///< Coordinate of the last build thing by this company.
 
+    std::array<Owner, MAX_COMPANY_SHARE_OWNERS> share_owners; ///< Owners of the shares of the company. #INVALID_OWNER if nobody has bought them yet.
 	TimerGameEconomy::Year inaugurated_year; ///< Economy year of starting the company.
 
 	uint8_t months_empty = 0; ///< NOSAVE: Number of months this company has not had a client in multiplayer.
@@ -122,7 +124,7 @@ struct CompanyProperties {
 	CompanyProperties()
 		: name_2(0), name_1(0), president_name_1(0), president_name_2(0),
 		  face(0), money(0), money_fraction(0), current_loan(0), max_loan(COMPANY_MAX_LOAN_DEFAULT),
-		  colour(COLOUR_BEGIN), block_preview(0), location_of_HQ(0), last_build_coordinate(0), inaugurated_year(0),
+		  colour(COLOUR_BEGIN), block_preview(0), location_of_HQ(0), last_build_coordinate(0), share_owners(), inaugurated_year(0),
 		  months_of_bankruptcy(0), bankrupt_asked(0), bankrupt_timeout(0), bankrupt_value(0),
 		  terraform_limit(0), clear_limit(0), tree_limit(0), build_object_limit(0), is_ai(false), engine_renew_list(nullptr) {}
 };
@@ -187,6 +189,7 @@ struct Company : CompanyProperties, CompanyPool::PoolItem<&_company_pool> {
 
 Money CalculateCompanyValue(const Company *c, bool including_loan = true);
 Money CalculateHostileTakeoverValue(const Company *c);
+Money CalculateCompanyValueExcludingShares(const Company *c, bool including_loan = true);
 
 extern uint _cur_company_tick_index;
 
