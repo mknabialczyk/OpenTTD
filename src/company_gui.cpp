@@ -2145,6 +2145,14 @@ static constexpr NWidgetPart _nested_company_widgets[] = {
 					EndContainer(),
 				EndContainer(),
 
+				NWidget(NWID_HORIZONTAL),
+					NWidget(NWID_SELECTION, INVALID_COLOUR, WID_C_SELECT_DESC_OWNERS),
+						NWidget(NWID_VERTICAL), SetPIP(5, 5, 4),
+							NWidget(WWT_EMPTY, INVALID_COLOUR, WID_C_DESC_OWNERS), SetMinimalTextLines(MAX_COMPANY_SHARE_OWNERS, 0),
+							NWidget(NWID_SPACER), SetFill(0, 1),
+						EndContainer(),
+					EndContainer(),
+
 				/* Multi player buttons. */
 				NWidget(NWID_HORIZONTAL), SetPIP(0, WidgetDimensions::unscaled.hsep_normal, 0), SetPIPRatio(1, 0, 0),
 					NWidget(NWID_VERTICAL), SetPIPRatio(1, 0, 0),
@@ -2234,7 +2242,8 @@ struct CompanyWindow : Window
 			bool reinit = false;
 
 			/* Button bar selection. */
-			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_BUTTONS)->SetDisplayedPlane(local ? 0 : SZSP_NONE);
+			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_BUTTONS)->SetDisplayedPlane(local ? CWP_BUTTONS_LOCAL : CWP_BUTTONS_OTHER);
+			this->InvalidateData;
 
 			/* Build HQ button handling. */
 			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_VIEW_BUILD_HQ)->SetDisplayedPlane((local && c->location_of_HQ == INVALID_TILE) ? CWP_VB_BUILD : CWP_VB_VIEW);
@@ -2246,14 +2255,7 @@ struct CompanyWindow : Window
 
 			/* Owners of company */
 			auto invalid_owner = [](auto owner) { return owner == INVALID_COMPANY; };
-			auto plane = std::all_of(c->share_owners.begin(), c->share_owners.end(), invalid_owner) ? SZSP_HORIZONTAL : 0;
-			auto wi = this->GetWidget<NWidgetStacked>(WID_C_SELECT_DESC_OWNERS);
-			if (plane != wi->shown_plane) {
-				wi->SetDisplayedPlane(plane);
-				reinit = true;
-			}
-
-			//reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_DESC_OWNERS)->SetDisplayedPlane(c->share_owners.begin(), c->share_owners.end(), invalid_owner) ? SZSP_HORIZONTAL : 0);
+			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_DESC_OWNERS)->SetDisplayedPlane(std::all_of(c->share_owners.begin(), c->share_owners.end(), invalid_owner) ? SZSP_HORIZONTAL : 0);
 
 			/* Enable/disable 'Give money' button. */
 			reinit |= this->GetWidget<NWidgetStacked>(WID_C_SELECT_GIVE_MONEY)->SetDisplayedPlane((local || _local_company == COMPANY_SPECTATOR || !_settings_game.economy.give_money) ? SZSP_NONE : 0);
